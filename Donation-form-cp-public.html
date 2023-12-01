@@ -1,0 +1,386 @@
+<!-- Public Code -->
+
+<!-- Couldpayments widget loading (https://developers.cloudpayments.ru/#demo-widget) -->
+<script src="https://widget.cloudpayments.ru/bundles/cloudpayments"></script>
+
+<!-- Donation form -->
+<div class="donation">
+
+  <form id="donation_form" class="donation_form" method="post" action="">
+
+      <div class="inputBlock recurrent_field">
+
+          <input type="radio" id="recurrent_choice_1" name="recurrent" value="monthly" class="check-with-label" required checked>
+          <label for="recurrent_choice_1" class="label-for-check">Monthy</label>
+
+          <input type="radio" id="recurrent_choice_2" name="recurrent" value="one-time" class="check-with-label">
+          <label for="recurrent_choice_2" class="label-for-check">One-time</label>
+
+      </div>
+
+      <div class="inputBlock value_field" style="margin-top: 10px;">
+
+          <input type="radio" id="value_choice_1" name="price" value="10" class="check-with-label">
+          <label for="value_choice_1" class="label-for-check">10 USD</label>
+          
+          <input type="radio" id="value_choice_2" name="price" value="30" class="check-with-label">
+          <label for="value_choice_2" class="label-for-check">30 USD</label>
+
+          <input type="radio" id="value_choice_3" name="price" value="50" class="check-with-label">
+          <label for="value_choice_3" class="label-for-check">50 USD</label>
+
+      </div>
+      
+      <div class="inputBlock custom_amount_field">
+          <input type="number" id="custom_price" name="custom_price" value="" class="check-with-label" placeholder="Your amount">
+      </div>
+   <div class="inputBlock email_field">
+          <input type="text" id="first_name" name="first_name" class="check-with-label" placeholder="First name">
+      </div>
+
+      <div class="inputBlock email_field">
+          <input type="text" id="last_name" name="last_name" class="check-with-label" placeholder="Last name">
+      </div>
+      <div class="inputBlock email_field">
+          <input type="text" id="email" name="email" value="" class="check-with-label" placeholder="Email" required>
+      </div>
+
+      <div class="inputBlock confirmation">
+          <div class='subscribe_confirmation'>
+            <input type="checkbox" class="checkbox-button__input" id="subscribe_confirmation" value="1" required="">
+            <label for="subscribe_confirmation">
+              I understand that the donation will be recurring each month (this can be turned off at any time)
+            </label>
+          </div>
+          <div>
+            <input type="checkbox" class="checkbox-button__input" id="privacy" value="1" required="" checked>
+            <label for="privacy">
+              I agree with <a href="/policy">Privacy policy</a>.
+            </label>
+          </div>
+          <div>
+            <input type="checkbox" class="checkbox-button__input" id="confirmation" value="1" required="" checked>
+            <label for="confirmation">
+              I agree with <a href="/offer">Terms of Use and Donation</a>.
+            </label>
+          </div>
+      </div>
+
+      <div class="inputBlock">
+          <input type="submit" value="Donate">
+      </div>
+
+  </form>
+
+</div>
+
+
+<script async="" type="text/javascript">
+
+  // Pause function for loading analytics
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // Function for generating a unique order number
+  function uniqueID() {
+    return Math.floor(Math.random() * Date.now())
+  }
+
+  // Function whether the object appears in the viewing area for analytics
+  function isInViewport(el) {
+    const rect = el.getBoundingClientRect();
+    return (
+      rect.top >= 0 &&
+      rect.left >= 0 &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+  }
+
+  let donation_form = document.querySelector('#donation_form');
+  let amount = document.querySelectorAll('input[name="price"]');
+  let custom_amount = document.querySelector('#custom_price');
+
+  let visible_flag = 0;
+  document.addEventListener('scroll', function () {
+    if (isInViewport(donation_form)) {
+      if (visible_flag === 0) {
+        console.log('Donation form in the field of visibility');
+        //Analytics code
+        visible_flag = 1;
+      }
+    }
+  }, {
+    passive: true
+  });
+
+  $(document).ready(function () {
+
+    // Hide or show fields depending on the selected regularity
+    $(".recurrent_field input").change(function () {
+
+      let email_block = $('.email_field');
+      let email_input = document.getElementById("email");
+      let subscribe_confirmation_block = $('.subscribe_confirmation');
+      let subscribe_confirmation_input = document.getElementById("subscribe_confirmation");
+      let recurrent_block = $('#recurrent');
+
+      if ($('#recurrent_choice_1').prop("checked")) {
+
+        recurrent_block.fadeIn(300);
+        email_input.required = true;
+        email_block.fadeIn(300);
+        subscribe_confirmation_block.fadeIn(300);
+        subscribe_confirmation_input.required = true;
+
+      } else {
+
+        recurrent_block.fadeOut(300);
+        email_input.required = false;
+        // email_block.fadeOut(300);
+        subscribe_confirmation_block.fadeOut(300);
+        subscribe_confirmation_input.required = false;
+
+      }
+    });
+  });
+
+
+  // Selecting a donation amount
+  $(document).ready(function () {
+      // Initial state 0
+      let flag = 0;
+      // If the state has changed
+      amount.forEach(function (price) {
+        price.onchange = function (e) {
+          if (this.checked && flag == 0) {
+            console.log('Donation amount selected');
+            // Analytics code
+            $(this).prop("checked", true);
+            flag = 1;
+          }
+          console.log('Clearing custom amount')
+          custom_amount.value = "";
+        };
+      });
+      // If the state has changed
+      custom_amount.onchange = function (e) {
+        if (this.value > 0 && flag == 0) {
+          console.log('Donation amount selected');
+          // Analytics code
+          $(this).prop("checked", true);
+          flag = 1;
+        }
+        console.log('Clearing selected amount')
+        amount.forEach(function (price) {
+          price.checked = false;
+        });
+      };
+    }
+  );
+
+  this.pay = function () {
+
+    let widget = new cp.CloudPayments();
+
+    let amount = parseFloat($("input[name='price']:checked").val());
+    let custom_amount = parseFloat($("input[name='custom_price']").val());
+    let recurrent = 'one-time';
+    let firstName = $("#firstName").val();
+    let lastName = $("#lastName").val();
+    let email = $("#email").val();
+    let order_id = uniqueID();
+    let url_link = window.location.href;
+
+    if (amount === undefined || isNaN(amount)) {
+
+        console.log('Using custom amount')
+        // If there is no selected amount
+        amount = custom_amount;
+
+    };
+
+    // Function to get parameter from URL
+    function getParameterByName(name, url) {
+      if (!url) url = window.location.href;
+      name = name.replace(/[\[\]]/g, "\\$&");
+      let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+      if (!results) return null;
+      if (!results[2]) return '';
+      return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+
+    // Getting a parameter from a URL. Change parameterName to real parameter you want to get
+    let parameterName = getParameterByName('parameterName');
+
+    let data = {
+      "email": email,
+      "firstName": firstName,
+      "lastName": lastName,
+      "amount": amount,
+      "url_link": url_link,
+      "parameterName": parameterName // Change parameterName to real parameter you want to send to Google Spreadsheet
+    };
+
+    if (parameterName) {
+      console.log('Parameter has been found and connected');
+    } else {
+      console.log('Donation without parameter');
+    }
+
+    /*
+    TEST: After configuring Google App Script, you can test the script's performance. 
+    If you activate this block, the data will be sent after the widget is called, not after payment. 
+    (same code below, after successful payment)
+    */
+    /*
+    $.ajax({
+      type: "POST",
+      url: "", // Paste the URL of your Google App Script Deployment
+      data: JSON.stringify(data),
+      success: function(response) {
+        console.log('The data has been successfully sent to Google Spreadsheet');
+      },
+      error: function(error) {
+        console.error('Error sending data to Google Spreadsheet:', error);
+      }
+    });
+    */    
+        
+    let product = {
+      "name": "Donation",
+      "price": amount,
+      "quantity": 1,
+    };
+
+    if (recurrent === 'monthly') {
+
+      console.log('Monthly donation')
+      data.CloudPayments = {recurrent: {interval: 'Month', period: 1,}};
+      product.name = "Monthly donation";
+
+    } else {
+
+      console.log('One-time donation')
+      product.name = "One-time donation";
+
+    }
+
+    console.log('Adding to cart')
+    window.dataLayer.push({
+      "ecommerce": {
+        "currencyCode": "USD",
+        "add": {
+          "products": [product]
+        }
+      }
+    })
+    
+    // Analytics code
+    console.log('New attempt to donate');
+
+    widget.pay('auth',
+      {
+        publicId: publicId,
+        description: '', // Insert the name of the payment (will be wisible to user)
+        amount: amount,
+        currency: 'USD',
+        accountId: email,
+        invoiceId: order_id,
+        skin: 'mini',
+        data: JSON.stringify(data)
+      },
+      {
+        onFail: function (reason, options) {
+          console.log('Removing from cart')
+          window.dataLayer.push({
+            "ecommerce": {
+              "currencyCode": "USD",
+              "remove": {
+                "products": [product]
+              }
+            }
+          })
+
+          // Analytics code
+          console.log('Donation has been canceled');
+
+          sleep(2000).then(() => {
+            window.location = '/failed-donate'; // redirect to the page after failed donation
+          });
+        },
+        onComplete: function (paymentResult, options) {
+
+          // If the donation is successful
+          if (paymentResult.success === true) {
+
+            console.log('Mark the item as paid')
+            window.dataLayer.push({
+              "ecommerce": {
+                "currencyCode": "USD",
+                "purchase": {
+                  "actionField": {
+                    "id": order_id,
+                  },
+                  "products": [product]
+                }
+              }
+            })
+
+            // Analytics code
+            console.log('New successful donation');
+
+            // Sending data of successful donation to Google Spreadsheet
+            $.ajax({
+              type: "POST",
+              url: "", // Paste the URL of your Google App Script Deployment
+              data: JSON.stringify(data),
+              success: function(response) {
+                console.log('The data has been successfully sent to Google Spreadsheet');
+              },
+              error: function(error) {
+                console.error('Error sending data to Google Spreadsheet:', error);
+              }
+            });
+
+            sleep(2000).then(() => {
+              window.location = '/thanks-for-donate'; // redirect to the page after successful donation
+            });
+
+          } else {
+
+            console.log('Removing from the cart')
+            window.dataLayer.push({
+              "ecommerce": {
+                "currencyCode": "USD",
+                "remove": {
+                  "products": [product]
+                }
+              }
+            })
+
+            //Analytics code
+            console.log('The donation failed');
+
+            sleep(2000).then(() => {
+              window.location = '/failed-donate';
+            });
+
+          }
+        }
+      }
+    )
+
+  }
+
+  // Capture the form submition and calling CloudPayments Widget
+  $('#donation_form').submit(function (e) {
+      pay();
+      e.preventDefault();
+
+    }
+  );
+
+</script> 
