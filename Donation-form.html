@@ -1,0 +1,79 @@
+<!-- Public Code -->
+
+<!-- Couldpayments widget loading (https://developers.cloudpayments.ru/#demo-widget) -->
+<script src="https://widget.cloudpayments.ru/bundles/cloudpayments"></script>
+
+<!-- Donation form -->
+<div class="donation">
+
+  <form id="donation_form" class="donation_form" method="post" action="">
+
+      <div class="inputBlock recurrent_field">
+
+          <input type="radio" id="recurrent_choice_1" name="recurrent" value="monthly" class="check-with-label" required checked>
+          <label for="recurrent_choice_1" class="label-for-check">Monthy</label>
+
+          <input type="radio" id="recurrent_choice_2" name="recurrent" value="one-time" class="check-with-label">
+          <label for="recurrent_choice_2" class="label-for-check">One-time</label>
+
+      </div>
+
+      <div class="inputBlock value_field" style="margin-top: 10px;">
+
+          <input type="radio" id="value_choice_1" name="price" value="10" class="check-with-label">
+          <label for="value_choice_1" class="label-for-check">10 USD</label>
+          
+          <input type="radio" id="value_choice_2" name="price" value="30" class="check-with-label">
+          <label for="value_choice_2" class="label-for-check">30 USD</label>
+
+          <input type="radio" id="value_choice_3" name="price" value="50" class="check-with-label">
+          <label for="value_choice_3" class="label-for-check">50 USD</label>
+
+      </div>
+      
+      <div class="inputBlock custom_amount_field">
+          <input type="number" id="custom_price" name="custom_price" value="" class="check-with-label" placeholder="Your amount">
+      </div>
+   <div class="inputBlock email_field">
+          <input type="text" id="first_name" name="first_name" class="check-with-label" placeholder="First name">
+      </div>
+
+      <div class="inputBlock email_field">
+          <input type="text" id="last_name" name="last_name" class="check-with-label" placeholder="Last name">
+      </div>
+      <div class="inputBlock email_field">
+          <input type="text" id="email" name="email" value="" class="check-with-label" placeholder="Email" required>
+      </div>
+
+      <div class="inputBlock confirmation">
+          <div class='subscribe_confirmation'>
+            <input type="checkbox" class="checkbox-button__input" id="subscribe_confirmation" value="1" required="">
+            <label for="subscribe_confirmation">
+              I understand that the donation will be recurring each month (this can be turned off at any time)
+            </label>
+          </div>
+          <div>
+            <input type="checkbox" class="checkbox-button__input" id="privacy" value="1" required="" checked>
+            <label for="privacy">
+              I agree with <a href="/policy">Privacy policy</a>.
+            </label>
+          </div>
+          <div>
+            <input type="checkbox" class="checkbox-button__input" id="confirmation" value="1" required="" checked>
+            <label for="confirmation">
+              I agree with <a href="/offer">Terms of Use and Donation</a>.
+            </label>
+          </div>
+      </div>
+
+      <div class="inputBlock">
+          <input type="submit" value="Donate">
+      </div>
+
+  </form>
+
+</div>
+
+
+<!-- Script from main.js -->
+<script async="" type="text/javascript" src="main.js"></script>
