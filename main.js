@@ -164,7 +164,7 @@
       url: "", // Paste the URL of your Google App Script Deployment
       data: JSON.stringify(data),
       success: function(response) {
-        console.log('The data has been successfully sent to Google Spreadsheet');
+        console.log('The data was successfully added to the Google Spreadsheet');
       },
       error: function(error) {
         console.error('Error sending data to Google Spreadsheet:', error);
@@ -261,7 +261,7 @@
               url: "", // Paste the URL of your Google App Script Deployment
               data: JSON.stringify(data),
               success: function(response) {
-                console.log('The data has been successfully sent to Google Spreadsheet');
+                console.log('The data was successfully added to the Google Spreadsheet');
               },
               error: function(error) {
                 console.error('Error sending data to Google Spreadsheet:', error);
